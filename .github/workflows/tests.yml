@@ -1,38 +1,115 @@
 name: tests
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+    push:
+        branches:
+            - develop
+            - production
+    pull_request:
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  ci:
-    runs-on: ubuntu-latest
+    ci:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
-        with:
-          php-version: '8.3'
-          tools: composer:v2
-          coverage: none
+            - name: Setup PHP
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+              with:
+                  php-version: "8.3"
+                  tools: composer:v2
+                  coverage: none
 
-      - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: '22'
+            - name: Setup Node
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: "22"
 
-      - name: Setup Application
-        run: composer setup
+            - name: Setup Application
+              run: composer setup
 
-      - name: Run CI Checks
-        run: composer ci:check
+            - name: Run CI Checks
+              run: composer ci:check
+
+    deploy:
+        needs: ci
+        if: github.event_name == 'push' && github.ref == 'refs/heads/production'
+        runs-on: ubuntu-latest
+        environment: production
+        concurrency:
+            group: production-deploy
+            cancel-in-progress: false
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+              with:
+                  php-version: "8.3"
+                  tools: composer:v2
+                  coverage: none
+
+            - name: Setup Node
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: "22"
+
+            - name: Install production dependencies
+              run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+            - name: Build frontend assets
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Configure SSH
+              env:
+                  DEPLOY_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+                  DEPLOY_KNOWN_HOSTS: ${{ secrets.PROD_HOST }}
+              run: |
+                  install -m 700 -d ~/.ssh
+                  printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+                  chmod 600 ~/.ssh/deploy_key
+                  printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+                  chmod 600 ~/.ssh/known_hosts
+
+            - name: Sync application files
+              env:
+                  DEPLOY_HOST: ${{ secrets.PROD_HOST }}
+                  DEPLOY_USER: ${{ secrets.PROD_USER }}
+                  DEPLOY_PORT: ${{ secrets.PROD_PORT || '22' }}
+                  DEPLOY_PATH: ${{ secrets.PROD_PATH }}
+              run: |
+                  test -n "$DEPLOY_HOST" && test -n "$DEPLOY_USER" && test -n "$DEPLOY_PATH"
+                  rsync --archive --compress --delete \
+                    --exclude='.env' \
+                    --exclude='storage/***' \
+                    --exclude='public/storage' \
+                    --exclude='.git' \
+                    --rsh="ssh -i ~/.ssh/deploy_key -p $DEPLOY_PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts" \
+                    ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+
+            - name: Run production deployment commands
+              env:
+                  DEPLOY_HOST: ${{ secrets.PROD_HOST }}
+                  DEPLOY_USER: ${{ secrets.PROD_USER }}
+                  DEPLOY_PORT: ${{ secrets.PROD_PORT || '22' }}
+                  DEPLOY_PATH: ${{ secrets.PROD_PATH }}
+              run: |
+                  ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" \
+                    -o IdentitiesOnly=yes \
+                    -o StrictHostKeyChecking=yes \
+                    -o UserKnownHostsFile=~/.ssh/known_hosts \
+                    "$PROD_USER@$PROD_HOST" \
+                    "cd '$PROD_PATH' && php artisan optimize:clear && php artisan migrate --force && php artisan storage:link --force && php artisan config:cache && php artisan view:cache"
