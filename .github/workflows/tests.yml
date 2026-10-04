@@ -78,40 +78,40 @@ jobs:
             - name: Configure SSH
               env:
                   DEPLOY_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
-                  DEPLOY_KNOWN_HOSTS: ${{ secrets.PROD_HOST }}
+                  DEPLOY_KNOWN_HOSTS: ${{ secrets.PROD_KNOWN_HOSTS }}
               run: |
                   install -m 700 -d ~/.ssh
-                  printf '%s\n' "$PROD_SSH_KEY" > ~/.ssh/deploy_key
+                  printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
                   chmod 600 ~/.ssh/deploy_key
-                  printf '%s\n' "$PROD_SSH_KEY" > ~/.ssh/known_hosts
+                  printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
                   chmod 600 ~/.ssh/known_hosts
 
             - name: Sync application files
               env:
                   DEPLOY_HOST: ${{ secrets.PROD_HOST }}
                   DEPLOY_USER: ${{ secrets.PROD_USER }}
-                  DEPLOY_PORT: "22"
+                  DEPLOY_PORT: ${{ secrets.PROD_PORT || '22' }}
                   DEPLOY_PATH: ${{ secrets.PROD_PATH }}
               run: |
-                  test -n "$PROD_HOST" && test -n "$PROD_USER" && test -n "$PROD_PATH"
+                  test -n "$DEPLOY_HOST" && test -n "$DEPLOY_USER" && test -n "$DEPLOY_PATH"
                   rsync --archive --compress --delete \
                     --exclude='.env' \
                     --exclude='storage/***' \
                     --exclude='public/storage' \
                     --exclude='.git' \
                     --rsh="ssh -i ~/.ssh/deploy_key -p $DEPLOY_PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts" \
-                    ./ "$PROD_USER@$PROD_HOST:$DEPLOY_PATH/"
+                    ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
 
             - name: Run production deployment commands
               env:
                   DEPLOY_HOST: ${{ secrets.PROD_HOST }}
                   DEPLOY_USER: ${{ secrets.PROD_USER }}
-                  DEPLOY_PORT: "22"
+                  DEPLOY_PORT: ${{ secrets.PROD_PORT || '22' }}
                   DEPLOY_PATH: ${{ secrets.PROD_PATH }}
               run: |
-                  ssh -i ~/.ssh/deploy_key -p "22" \
+                  ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" \
                     -o IdentitiesOnly=yes \
                     -o StrictHostKeyChecking=yes \
                     -o UserKnownHostsFile=~/.ssh/known_hosts \
-                    "$PROD_USER@$PROD_HOST" \
-                    "cd '$PROD_PATH' && php artisan optimize:clear && php artisan migrate --force && php artisan storage:link --force && php artisan config:cache && php artisan view:cache"
+                    "$DEPLOY_USER@$DEPLOY_HOST" \
+                    "cd '$DEPLOY_PATH' && php artisan optimize:clear && php artisan migrate --force && php artisan storage:link --force && php artisan config:cache && php artisan view:cache"
