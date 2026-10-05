@@ -29,7 +29,7 @@ class PublisherController extends Controller
     {
         Publisher::create($this->validated($request));
 
-        return to_route('publishers.index')->with('success', 'Publisher created.');
+        return to_route('publishers.index')->with('success', __('Publisher created.'));
     }
 
     public function edit(Publisher $publisher): Response
@@ -41,18 +41,18 @@ class PublisherController extends Controller
     {
         $publisher->update($this->validated($request, $publisher));
 
-        return to_route('publishers.index')->with('success', 'Publisher updated.');
+        return to_route('publishers.index')->with('success', __('Publisher updated.'));
     }
 
     public function destroy(Publisher $publisher): RedirectResponse
     {
         if ($publisher->books()->exists()) {
-            return back()->withErrors(['publisher' => 'This publisher still has books assigned to it.']);
+            return back()->withErrors(['publisher' => __('This publisher still has books assigned to it.')]);
         }
 
         $publisher->delete();
 
-        return to_route('publishers.index')->with('success', 'Publisher deleted.');
+        return to_route('publishers.index')->with('success', __('Publisher deleted.'));
     }
 
     /** @return array{title: string, address: ?string, telephone: ?string, mobile: ?string, contact_person: ?string, status: int} */

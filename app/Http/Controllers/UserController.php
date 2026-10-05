@@ -34,7 +34,7 @@ class UserController extends Controller
         $data['email_verified_at'] = now();
         User::create($data);
 
-        return to_route('users.index')->with('success', 'User created.');
+        return to_route('users.index')->with('success', __('User created.'));
     }
 
     public function edit(User $user): Response
@@ -51,27 +51,27 @@ class UserController extends Controller
         unset($data['password']);
 
         if ($user->isSuperadmin() && $data['role'] !== 'superadmin' && User::where('role', 'superadmin')->count() === 1) {
-            return back()->withErrors(['role' => 'At least one superadmin must remain.']);
+            return back()->withErrors(['role' => __('At least one superadmin must remain.')]);
         }
 
         $user->update($data);
 
-        return to_route('users.index')->with('success', 'User updated.');
+        return to_route('users.index')->with('success', __('User updated.'));
     }
 
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if ($request->user()->is($user)) {
-            return back()->withErrors(['user' => 'You cannot delete your own account.']);
+            return back()->withErrors(['user' => __('You cannot delete your own account.')]);
         }
 
         if ($user->isSuperadmin() && User::where('role', 'superadmin')->count() === 1) {
-            return back()->withErrors(['user' => 'At least one superadmin must remain.']);
+            return back()->withErrors(['user' => __('At least one superadmin must remain.')]);
         }
 
         $user->delete();
 
-        return to_route('users.index')->with('success', 'User deleted.');
+        return to_route('users.index')->with('success', __('User deleted.'));
     }
 
     /** @return array<string, mixed> */
@@ -81,6 +81,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user)],
             'role' => ['required', Rule::in(['superadmin', 'librarian', 'reader'])],
+            'locale' => ['nullable', Rule::in(array_keys(config('locales.available')))],
             'password' => [$user ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
         ]);
     }

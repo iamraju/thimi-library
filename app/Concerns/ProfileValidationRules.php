@@ -18,6 +18,7 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
+            'locale' => ['nullable', Rule::in(array_keys(config('locales.available')))],
         ];
     }
 

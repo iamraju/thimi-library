@@ -1,44 +1,48 @@
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
-import { Button } from '@/components/ui/button';
+import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import InputError from "@/components/InputError.vue";
+import PasswordInput from "@/components/PasswordInput.vue";
+import { Button } from "@/components/ui/button";
 
 const props = defineProps<{
     user?: {
         id: number;
         name: string;
         email: string;
-        role: 'superadmin' | 'librarian' | 'reader';
+        role: "superadmin" | "librarian" | "reader";
+        locale: string | null;
     };
 }>();
+const page = usePage();
 const form = useForm({
-    name: props.user?.name ?? '',
-    email: props.user?.email ?? '',
-    role: props.user?.role ?? 'reader',
-    password: '',
-    password_confirmation: '',
+    name: props.user?.name ?? "",
+    email: props.user?.email ?? "",
+    role: props.user?.role ?? "reader",
+    locale: props.user?.locale ?? page.props.defaultLocale,
+    password: "",
+    password_confirmation: "",
 });
 const submit = () =>
-    props.user ? form.put(`/users/${props.user.id}`) : form.post('/users');
+    props.user ? form.put(`/users/${props.user.id}`) : form.post("/users");
 </script>
 
 <template>
-    <Head :title="user ? 'Edit user' : 'New user'" />
+    <Head :title="user ? $t('Edit user') : $t('New user')" />
     <main class="max-w-2xl space-y-6 p-4 md:p-6">
         <header>
             <Link
                 href="/users"
                 class="text-sm text-muted-foreground hover:text-foreground"
-                >Users</Link
+                >{{ $t("Users") }}</Link
             >
             <h1 class="mt-2 text-2xl font-semibold">
-                {{ user ? 'Edit user' : 'Add user' }}
+                {{ user ? $t("Edit user") : $t("Add user") }}
             </h1>
         </header>
         <form class="grid gap-5 sm:grid-cols-2" @submit.prevent="submit">
             <label class="grid gap-2 text-sm font-medium"
-                >Full name<input
+                >{{ $t("Full name")
+                }}<input
                     v-model="form.name"
                     required
                     maxlength="255"
@@ -47,7 +51,8 @@ const submit = () =>
                     :message="form.errors.name"
             /></label>
             <label class="grid gap-2 text-sm font-medium"
-                >Email<input
+                >{{ $t("Email")
+                }}<input
                     v-model="form.email"
                     required
                     type="email"
@@ -56,17 +61,35 @@ const submit = () =>
                     :message="form.errors.email"
             /></label>
             <label class="grid gap-2 text-sm font-medium"
-                >Role<select
+                >{{ $t("Role")
+                }}<select
                     v-model="form.role"
                     class="h-10 rounded-md border bg-background px-3 font-normal"
                 >
-                    <option value="reader">Reader</option>
-                    <option value="librarian">Librarian</option>
-                    <option value="superadmin">Superadmin</option></select
+                    <option value="reader">{{ $t("reader") }}</option>
+                    <option value="librarian">{{ $t("librarian") }}</option>
+                    <option value="superadmin">
+                        {{ $t("superadmin") }}
+                    </option></select
                 ><InputError :message="form.errors.role"
             /></label>
             <label class="grid gap-2 text-sm font-medium"
-                >{{ user ? 'New password (optional)' : 'Password'
+                >{{ $t("Preferred language")
+                }}<select
+                    v-model="form.locale"
+                    class="h-10 rounded-md border bg-background px-3 font-normal"
+                >
+                    <option
+                        v-for="(name, code) in page.props.locales"
+                        :key="code"
+                        :value="code"
+                    >
+                        {{ name }}
+                    </option></select
+                ><InputError :message="form.errors.locale"
+            /></label>
+            <label class="grid gap-2 text-sm font-medium"
+                >{{ user ? $t("New password (optional)") : $t("Password")
                 }}<PasswordInput
                     v-model="form.password"
                     :required="!user"
@@ -75,7 +98,8 @@ const submit = () =>
                     :message="form.errors.password"
             /></label>
             <label class="grid gap-2 text-sm font-medium sm:col-span-2"
-                >Confirm password<PasswordInput
+                >{{ $t("Confirm password")
+                }}<PasswordInput
                     v-model="form.password_confirmation"
                     :required="!user"
                     autocomplete="new-password"
@@ -84,10 +108,10 @@ const submit = () =>
             /></label>
             <div class="flex gap-3 sm:col-span-2">
                 <Button :disabled="form.processing">{{
-                    form.processing ? 'Saving…' : 'Save user'
+                    form.processing ? $t("Saving…") : $t("Save user")
                 }}</Button
                 ><Button as-child variant="outline"
-                    ><Link href="/users">Cancel</Link></Button
+                    ><Link href="/users">{{ $t("Cancel") }}</Link></Button
                 >
             </div>
         </form>

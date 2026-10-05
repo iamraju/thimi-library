@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from "@inertiajs/vue3";
+import { t } from "@/composables/useI18n";
 
 type Publisher = {
     id: number;
@@ -18,37 +19,41 @@ const props = defineProps<{
     };
     filters: { search?: string };
 }>();
-const search = useForm({ search: props.filters.search ?? '' });
+const search = useForm({ search: props.filters.search ?? "" });
 const submitSearch = () =>
-    search.get('/publishers', { preserveState: true, replace: true });
+    search.get("/publishers", { preserveState: true, replace: true });
 const remove = (id: number) => {
-    if (window.confirm('Delete this publisher?'))
+    if (window.confirm(t("Delete this publisher?")))
         router.delete(`/publishers/${id}`);
 };
 </script>
 
 <template>
-    <Head title="Publishers" />
+    <Head :title="$t('Publishers')" />
     <main class="space-y-6 p-4 md:p-6">
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-sm text-muted-foreground">Catalog setup</p>
-                <h1 class="mt-1 text-2xl font-semibold">Publishers</h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ $t("Catalog setup") }}
+                </p>
+                <h1 class="mt-1 text-2xl font-semibold">
+                    {{ $t("Publishers") }}
+                </h1>
             </div>
             <Link
                 href="/publishers/create"
                 class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
-                >Add publisher</Link
+                >{{ $t("Add publisher") }}</Link
             >
         </header>
         <form class="flex max-w-lg gap-2" @submit.prevent="submitSearch">
             <input
                 v-model="search.search"
                 type="search"
-                placeholder="Find a publisher"
+                :placeholder="$t('Find a publisher')"
                 class="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm"
             /><button class="h-9 rounded-md border px-4 text-sm font-medium">
-                Search
+                {{ $t("Search") }}
             </button>
         </form>
         <div class="overflow-x-auto border-y">
@@ -57,14 +62,22 @@ const remove = (id: number) => {
                     class="text-xs tracking-wide text-muted-foreground uppercase"
                 >
                     <tr>
-                        <th class="py-3 pr-4 font-medium">Publisher</th>
-                        <th class="py-3 pr-4 font-medium">Contact</th>
                         <th class="py-3 pr-4 font-medium">
-                            Telephone / Mobile
+                            {{ $t("Publisher") }}
                         </th>
-                        <th class="py-3 pr-4 font-medium">Books</th>
-                        <th class="py-3 pr-4 font-medium">Status</th>
-                        <th class="py-3 text-right font-medium">Actions</th>
+                        <th class="py-3 pr-4 font-medium">
+                            {{ $t("Contact") }}
+                        </th>
+                        <th class="py-3 pr-4 font-medium">
+                            {{ $t("Telephone / Mobile") }}
+                        </th>
+                        <th class="py-3 pr-4 font-medium">{{ $t("Books") }}</th>
+                        <th class="py-3 pr-4 font-medium">
+                            {{ $t("Status") }}
+                        </th>
+                        <th class="py-3 text-right font-medium">
+                            {{ $t("Actions") }}
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -77,35 +90,37 @@ const remove = (id: number) => {
                             <div
                                 class="max-w-sm truncate text-xs text-muted-foreground"
                             >
-                                {{ publisher.address || '—' }}
+                                {{ publisher.address || "—" }}
                             </div>
                         </td>
                         <td class="py-3 pr-4">
-                            {{ publisher.contact_person || '—' }}
+                            {{ publisher.contact_person || "—" }}
                         </td>
                         <td class="py-3 pr-4 text-muted-foreground">
                             {{
                                 [publisher.telephone, publisher.mobile]
                                     .filter(Boolean)
-                                    .join(' / ') || '—'
+                                    .join(" / ") || "—"
                             }}
                         </td>
                         <td class="py-3 pr-4 tabular-nums">
                             {{ publisher.books_count }}
                         </td>
                         <td class="py-3 pr-4">
-                            {{ publisher.status ? 'Active' : 'Inactive' }}
+                            {{
+                                publisher.status ? $t("Active") : $t("Inactive")
+                            }}
                         </td>
                         <td class="py-3 text-right">
                             <Link
                                 :href="`/publishers/${publisher.id}/edit`"
                                 class="text-primary hover:underline"
-                                >Edit</Link
+                                >{{ $t("Edit") }}</Link
                             ><button
                                 class="ml-4 text-destructive hover:underline"
                                 @click="remove(publisher.id)"
                             >
-                                Delete
+                                {{ $t("Delete") }}
                             </button>
                         </td>
                     </tr>
@@ -114,7 +129,7 @@ const remove = (id: number) => {
                             colspan="6"
                             class="py-10 text-center text-muted-foreground"
                         >
-                            No publishers found.
+                            {{ $t("No publishers found.") }}
                         </td>
                     </tr>
                 </tbody>

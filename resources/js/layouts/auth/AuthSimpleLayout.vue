@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
-import { home } from '@/routes';
+import { Link } from "@inertiajs/vue3";
+import AppLogoIcon from "@/components/AppLogoIcon.vue";
+import { useI18n } from "@/composables/useI18n";
+import { home } from "@/routes";
 
 defineProps<{
     title?: string;
     description?: string;
 }>();
+
+const { locale, locales } = useI18n();
 </script>
 
 <template>
@@ -27,16 +30,36 @@ defineProps<{
                                 class="size-9 fill-current text-[var(--foreground)] dark:text-white"
                             />
                         </div>
-                        <span class="sr-only">{{ title }}</span>
+                        <span class="sr-only">{{ title && $t(title) }}</span>
                     </Link>
                     <div class="space-y-2 text-center">
-                        <h1 class="text-xl font-medium">{{ title }}</h1>
+                        <h1 class="text-xl font-medium">
+                            {{ title && $t(title) }}
+                        </h1>
                         <p class="text-center text-sm text-muted-foreground">
-                            {{ description }}
+                            {{ description && $t(description) }}
                         </p>
                     </div>
                 </div>
                 <slot />
+            </div>
+            <div class="mt-8 flex justify-center gap-4 text-sm">
+                <Link
+                    v-for="(name, code) in locales()"
+                    :key="code"
+                    href="/locale"
+                    method="post"
+                    as="button"
+                    :data="{ locale: code }"
+                    preserve-scroll
+                    :class="
+                        locale() === code
+                            ? 'font-semibold'
+                            : 'text-muted-foreground hover:text-foreground'
+                    "
+                >
+                    {{ name }}
+                </Link>
             </div>
         </div>
     </div>

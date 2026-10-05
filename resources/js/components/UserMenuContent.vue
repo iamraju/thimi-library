@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings } from '@lucide/vue';
+import { Link, router } from "@inertiajs/vue3";
+import { Check, Languages, LogOut, Settings } from "@lucide/vue";
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import UserInfo from '@/components/UserInfo.vue';
-import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
-import type { User } from '@/types';
+} from "@/components/ui/dropdown-menu";
+import UserInfo from "@/components/UserInfo.vue";
+import { useI18n } from "@/composables/useI18n";
+import { logout } from "@/routes";
+import { edit } from "@/routes/profile";
+import type { User } from "@/types";
 
 type Props = {
     user: User;
@@ -21,6 +22,11 @@ const handleLogout = () => {
 };
 
 defineProps<Props>();
+
+const { locale, locales } = useI18n();
+
+const setLocale = (code: string) =>
+    router.post("/locale", { locale: code }, { preserveScroll: true });
 </script>
 
 <template>
@@ -34,8 +40,26 @@ defineProps<Props>();
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
                 <Settings class="mr-2 h-4 w-4" />
-                Settings
+                {{ $t("Settings") }}
             </Link>
+        </DropdownMenuItem>
+        <DropdownMenuLabel
+            class="flex items-center gap-2 text-xs text-muted-foreground"
+        >
+            <Languages class="h-4 w-4" />
+            {{ $t("Language") }}
+        </DropdownMenuLabel>
+        <DropdownMenuItem
+            v-for="(name, code) in locales()"
+            :key="code"
+            class="cursor-pointer"
+            @click="setLocale(String(code))"
+        >
+            <Check
+                class="mr-2 h-4 w-4"
+                :class="{ invisible: locale() !== code }"
+            />
+            {{ name }}
         </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
@@ -48,7 +72,7 @@ defineProps<Props>();
             data-test="logout-button"
         >
             <LogOut class="mr-2 h-4 w-4" />
-            Log out
+            {{ $t("Log out") }}
         </Link>
     </DropdownMenuItem>
 </template>

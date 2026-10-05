@@ -55,7 +55,7 @@ class BookController extends Controller
         }
         Book::create($data);
 
-        return to_route('books.index')->with('success', 'Book created.');
+        return to_route('books.index')->with('success', __('Book created.'));
     }
 
     public function edit(Book $book): Response
@@ -78,14 +78,14 @@ class BookController extends Controller
         }
         $book->update($data);
 
-        return to_route('books.index')->with('success', 'Book updated.');
+        return to_route('books.index')->with('success', __('Book updated.'));
     }
 
     public function destroy(Book $book): RedirectResponse
     {
         $book->delete();
 
-        return to_route('books.index')->with('success', 'Book deleted.');
+        return to_route('books.index')->with('success', __('Book deleted.'));
     }
 
     /** @return array<string, mixed> */

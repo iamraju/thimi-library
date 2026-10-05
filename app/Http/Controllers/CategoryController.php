@@ -29,7 +29,7 @@ class CategoryController extends Controller
     {
         Category::create($this->validated($request));
 
-        return to_route('categories.index')->with('success', 'Category created.');
+        return to_route('categories.index')->with('success', __('Category created.'));
     }
 
     public function edit(Category $category): Response
@@ -41,18 +41,18 @@ class CategoryController extends Controller
     {
         $category->update($this->validated($request, $category));
 
-        return to_route('categories.index')->with('success', 'Category updated.');
+        return to_route('categories.index')->with('success', __('Category updated.'));
     }
 
     public function destroy(Category $category): RedirectResponse
     {
         if ($category->books()->exists()) {
-            return back()->withErrors(['category' => 'This category still has books assigned to it.']);
+            return back()->withErrors(['category' => __('This category still has books assigned to it.')]);
         }
 
         $category->delete();
 
-        return to_route('categories.index')->with('success', 'Category deleted.');
+        return to_route('categories.index')->with('success', __('Category deleted.'));
     }
 
     /** @return array{title: string, description: ?string, status: int} */
