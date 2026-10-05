@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Link } from "@inertiajs/vue3";
-import AppLogoIcon from "@/components/AppLogoIcon.vue";
-import { useI18n } from "@/composables/useI18n";
-import { home } from "@/routes";
+import { Link } from '@inertiajs/vue3';
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import { useI18n } from '@/composables/useI18n';
+import { home } from '@/routes';
 
 defineProps<{
     title?: string;

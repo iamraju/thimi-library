@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Head, Link, router, useForm } from "@inertiajs/vue3";
-import { t } from "@/composables/useI18n";
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { t } from '@/composables/useI18n';
 
 type Book = {
     id: number;
     title: string;
     slug: string;
     author_name: string | null;
-    book_type: "new" | "old";
+    book_type: 'new' | 'old';
     cover_image_url: string | null;
     status: number;
     category: { title: string };
@@ -22,21 +22,21 @@ const props = defineProps<{
     filters: { search?: string; category_id?: string };
 }>();
 const filters = useForm({
-    search: props.filters.search ?? "",
-    category_id: props.filters.category_id ?? "",
+    search: props.filters.search ?? '',
+    category_id: props.filters.category_id ?? '',
 });
 const applyFilters = () =>
-    filters.get("/books", { preserveState: true, replace: true });
+    filters.get('/books', { preserveState: true, replace: true });
 const remove = (id: number) => {
-    if (window.confirm(t("Delete this book?"))) router.delete(`/books/${id}`);
+    if (window.confirm(t('Delete this book?'))) router.delete(`/books/${id}`);
 };
 const exportUrl = () => {
     const params = new URLSearchParams();
-    if (props.filters.search) params.set("search", props.filters.search);
+    if (props.filters.search) params.set('search', props.filters.search);
     if (props.filters.category_id)
-        params.set("category_id", props.filters.category_id);
+        params.set('category_id', props.filters.category_id);
     const query = params.toString();
-    return `/books/export${query ? `?${query}` : ""}`;
+    return `/books/export${query ? `?${query}` : ''}`;
 };
 </script>
 
@@ -46,15 +46,15 @@ const exportUrl = () => {
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <p class="text-sm text-muted-foreground">
-                    {{ $t("Library catalog") }}
+                    {{ $t('Library catalog') }}
                 </p>
-                <h1 class="mt-1 text-2xl font-semibold">{{ $t("Books") }}</h1>
+                <h1 class="mt-1 text-2xl font-semibold">{{ $t('Books') }}</h1>
             </div>
             <Link
                 v-if="$page.props.auth.user?.role !== 'reader'"
                 href="/books/create"
                 class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
-                >{{ $t("Add book") }}</Link
+                >{{ $t('Add book') }}</Link
             >
         </header>
         <form class="grid gap-2 sm:flex" @submit.prevent="applyFilters">
@@ -67,7 +67,7 @@ const exportUrl = () => {
                 v-model="filters.category_id"
                 class="h-9 rounded-md border bg-background px-3 text-sm"
             >
-                <option value="">{{ $t("All categories") }}</option>
+                <option value="">{{ $t('All categories') }}</option>
                 <option
                     v-for="category in categories"
                     :key="category.id"
@@ -76,11 +76,11 @@ const exportUrl = () => {
                     {{ category.title }}
                 </option></select
             ><button class="h-9 rounded-md border px-4 text-sm font-medium">
-                {{ $t("Filter") }}</button
+                {{ $t('Filter') }}</button
             ><a
                 :href="exportUrl()"
                 class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-accent"
-                >{{ $t("Export to Excel") }}</a
+                >{{ $t('Export to Excel') }}</a
             >
         </form>
         <div class="overflow-x-auto border-y">
@@ -89,22 +89,22 @@ const exportUrl = () => {
                     class="text-xs tracking-wide text-muted-foreground uppercase"
                 >
                     <tr>
-                        <th class="py-3 pr-4 font-medium">{{ $t("Book") }}</th>
-                        <th class="py-3 pr-4 font-medium">{{ $t("Type") }}</th>
+                        <th class="py-3 pr-4 font-medium">{{ $t('Book') }}</th>
+                        <th class="py-3 pr-4 font-medium">{{ $t('Type') }}</th>
                         <th class="py-3 pr-4 font-medium">
-                            {{ $t("Category") }}
+                            {{ $t('Category') }}
                         </th>
                         <th class="py-3 pr-4 font-medium">
-                            {{ $t("Publisher") }}
+                            {{ $t('Publisher') }}
                         </th>
                         <th class="py-3 pr-4 font-medium">
-                            {{ $t("Status") }}
+                            {{ $t('Status') }}
                         </th>
                         <th
                             v-if="$page.props.auth.user?.role !== 'reader'"
                             class="py-3 text-right font-medium"
                         >
-                            {{ $t("Actions") }}
+                            {{ $t('Actions') }}
                         </th>
                     </tr>
                 </thead>
@@ -125,7 +125,7 @@ const exportUrl = () => {
                                     <div class="text-xs text-muted-foreground">
                                         {{
                                             book.author_name ||
-                                            $t("Author not specified")
+                                            $t('Author not specified')
                                         }}
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@ const exportUrl = () => {
                         </td>
                         <td class="py-3 pr-4 text-muted-foreground">
                             {{
-                                book.book_type === "old" ? $t("Old") : $t("New")
+                                book.book_type === 'old' ? $t('Old') : $t('New')
                             }}
                         </td>
                         <td class="py-3 pr-4 text-muted-foreground">
@@ -143,7 +143,7 @@ const exportUrl = () => {
                             {{ book.publisher.title }}
                         </td>
                         <td class="py-3 pr-4">
-                            {{ book.status ? $t("Active") : $t("Inactive") }}
+                            {{ book.status ? $t('Active') : $t('Inactive') }}
                         </td>
                         <td
                             v-if="$page.props.auth.user?.role !== 'reader'"
@@ -152,12 +152,12 @@ const exportUrl = () => {
                             <Link
                                 :href="`/books/${book.id}/edit`"
                                 class="text-primary hover:underline"
-                                >{{ $t("Edit") }}</Link
+                                >{{ $t('Edit') }}</Link
                             ><button
                                 class="ml-4 text-destructive hover:underline"
                                 @click="remove(book.id)"
                             >
-                                {{ $t("Delete") }}
+                                {{ $t('Delete') }}
                             </button>
                         </td>
                     </tr>
@@ -168,7 +168,7 @@ const exportUrl = () => {
                             "
                             class="py-10 text-center text-muted-foreground"
                         >
-                            {{ $t("No books found.") }}
+                            {{ $t('No books found.') }}
                         </td>
                     </tr>
                 </tbody>

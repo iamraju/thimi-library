@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Head, Link, router, useForm } from "@inertiajs/vue3";
-import { t } from "@/composables/useI18n";
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { t } from '@/composables/useI18n';
 
 type User = {
     id: number;
     name: string;
     email: string;
-    role: "superadmin" | "librarian" | "reader";
+    role: 'superadmin' | 'librarian' | 'reader';
     locale: string | null;
     created_at: string;
 };
@@ -17,11 +17,11 @@ const props = defineProps<{
     };
     filters: { search?: string };
 }>();
-const search = useForm({ search: props.filters.search ?? "" });
+const search = useForm({ search: props.filters.search ?? '' });
 const submitSearch = () =>
-    search.get("/users", { preserveState: true, replace: true });
+    search.get('/users', { preserveState: true, replace: true });
 const remove = (user: User) => {
-    if (window.confirm(t("Delete :name?", { name: user.name })))
+    if (window.confirm(t('Delete :name?', { name: user.name })))
         router.delete(`/users/${user.id}`);
 };
 </script>
@@ -32,14 +32,14 @@ const remove = (user: User) => {
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <p class="text-sm text-muted-foreground">
-                    {{ $t("Access control") }}
+                    {{ $t('Access control') }}
                 </p>
-                <h1 class="mt-1 text-2xl font-semibold">{{ $t("Users") }}</h1>
+                <h1 class="mt-1 text-2xl font-semibold">{{ $t('Users') }}</h1>
             </div>
             <Link
                 href="/users/create"
                 class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
-                >{{ $t("Add user") }}</Link
+                >{{ $t('Add user') }}</Link
             >
         </header>
         <form class="flex max-w-lg gap-2" @submit.prevent="submitSearch">
@@ -49,7 +49,7 @@ const remove = (user: User) => {
                 :placeholder="$t('Find by name or email')"
                 class="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm"
             /><button class="h-9 rounded-md border px-4 text-sm font-medium">
-                {{ $t("Search") }}
+                {{ $t('Search') }}
             </button>
         </form>
         <div class="overflow-x-auto border-y">
@@ -58,15 +58,15 @@ const remove = (user: User) => {
                     class="text-xs tracking-wide text-muted-foreground uppercase"
                 >
                     <tr>
-                        <th class="py-3 pr-4 font-medium">{{ $t("Name") }}</th>
-                        <th class="py-3 pr-4 font-medium">{{ $t("Email") }}</th>
-                        <th class="py-3 pr-4 font-medium">{{ $t("Role") }}</th>
+                        <th class="py-3 pr-4 font-medium">{{ $t('Name') }}</th>
+                        <th class="py-3 pr-4 font-medium">{{ $t('Email') }}</th>
+                        <th class="py-3 pr-4 font-medium">{{ $t('Role') }}</th>
                         <th class="py-3 pr-4 font-medium">
-                            {{ $t("Language") }}
+                            {{ $t('Language') }}
                         </th>
-                        <th class="py-3 pr-4 font-medium">{{ $t("Added") }}</th>
+                        <th class="py-3 pr-4 font-medium">{{ $t('Added') }}</th>
                         <th class="py-3 text-right font-medium">
-                            {{ $t("Actions") }}
+                            {{ $t('Actions') }}
                         </th>
                     </tr>
                 </thead>
@@ -93,12 +93,12 @@ const remove = (user: User) => {
                             <Link
                                 :href="`/users/${user.id}/edit`"
                                 class="text-primary hover:underline"
-                                >{{ $t("Edit") }}</Link
+                                >{{ $t('Edit') }}</Link
                             ><button
                                 class="ml-4 text-destructive hover:underline"
                                 @click="remove(user)"
                             >
-                                {{ $t("Delete") }}
+                                {{ $t('Delete') }}
                             </button>
                         </td>
                     </tr>
@@ -107,7 +107,7 @@ const remove = (user: User) => {
                             colspan="6"
                             class="py-10 text-center text-muted-foreground"
                         >
-                            {{ $t("No users found.") }}
+                            {{ $t('No users found.') }}
                         </td>
                     </tr>
                 </tbody>

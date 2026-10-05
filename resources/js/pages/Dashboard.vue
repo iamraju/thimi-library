@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { Head } from "@inertiajs/vue3";
-import { Link } from "@inertiajs/vue3";
-import { BookOpen, Building2, Tags, Users } from "@lucide/vue";
+import { Head } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import { BookOpen, Building2, Tags, Users } from '@lucide/vue';
 
 defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: "Dashboard",
-                href: "/dashboard",
+                title: 'Dashboard',
+                href: '/dashboard',
             },
         ],
     },
 });
 
 defineProps<{
-    role: "superadmin" | "librarian" | "reader";
+    role: 'superadmin' | 'librarian' | 'reader';
     stats: {
         books: number;
         active_books: number;
@@ -40,10 +40,10 @@ defineProps<{
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <p class="text-sm font-medium text-muted-foreground capitalize">
-                    {{ $t(role) }} {{ $t("workspace") }}
+                    {{ $t(role) }} {{ $t('workspace') }}
                 </p>
                 <h1 class="mt-1 text-2xl font-semibold tracking-tight">
-                    {{ $t("Library overview") }}
+                    {{ $t('Library overview') }}
                 </h1>
             </div>
             <Link
@@ -51,7 +51,7 @@ defineProps<{
                 href="/books/create"
                 class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
-                {{ $t("Add a book") }}
+                {{ $t('Add a book') }}
             </Link>
         </header>
 
@@ -101,12 +101,12 @@ defineProps<{
         <section>
             <div class="mb-3 flex items-center justify-between">
                 <h2 class="text-base font-semibold">
-                    {{ $t("Recently added books") }}
+                    {{ $t('Recently added books') }}
                 </h2>
                 <Link
                     href="/books"
                     class="text-sm font-medium text-primary hover:underline"
-                    >{{ $t("View collection") }}</Link
+                    >{{ $t('View collection') }}</Link
                 >
             </div>
             <div class="overflow-x-auto border-y">
@@ -116,15 +116,15 @@ defineProps<{
                     >
                         <tr>
                             <th class="py-3 pr-4 font-medium">
-                                {{ $t("Title") }}
+                                {{ $t('Title') }}
                             </th>
                             <th class="py-3 pr-4 font-medium">
-                                {{ $t("Category") }}
+                                {{ $t('Category') }}
                             </th>
                             <th class="py-3 pr-4 font-medium">
-                                {{ $t("Publisher") }}
+                                {{ $t('Publisher') }}
                             </th>
-                            <th class="py-3 font-medium">{{ $t("Status") }}</th>
+                            <th class="py-3 font-medium">{{ $t('Status') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -147,8 +147,8 @@ defineProps<{
                                     "
                                     >{{
                                         book.status
-                                            ? $t("Active")
-                                            : $t("Inactive")
+                                            ? $t('Active')
+                                            : $t('Inactive')
                                     }}</span
                                 >
                             </td>
@@ -158,7 +158,7 @@ defineProps<{
                                 colspan="4"
                                 class="py-8 text-center text-muted-foreground"
                             >
-                                {{ $t("No books have been added yet.") }}
+                                {{ $t('No books have been added yet.') }}
                             </td>
                         </tr>
                     </tbody>
